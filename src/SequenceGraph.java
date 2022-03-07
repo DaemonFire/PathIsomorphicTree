@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 public class SequenceGraph {
-    Set<Vertex> vertices;
+    List<Vertex> vertices;
     List<StaticEdge> edges;
 
-    public Set<Vertex> getVertices() {
+    public List<Vertex> getVertices() {
         return vertices;
     }
 
@@ -19,7 +19,7 @@ public class SequenceGraph {
         return edges;
     }
 
-    public void setVertices(Set<Vertex> vertices) {
+    public void setVertices(List<Vertex> vertices) {
         this.vertices = vertices;
     }
 
@@ -35,18 +35,8 @@ public class SequenceGraph {
         edges.add(e);
     }
 
-    public void setVertices(List<Vertex> vertices) {
-        HashSet<Vertex> tmp = new HashSet<>();
-        for (Vertex u : vertices) {
-            tmp.add(u);
-        }
-        this.vertices = tmp;
-
-    }
-
-
     public SequenceGraph(){
-        vertices = new HashSet<Vertex>();
+        vertices = new ArrayList<Vertex>();
         edges = new ArrayList<StaticEdge>();
     }
 }

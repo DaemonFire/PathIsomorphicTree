@@ -2,22 +2,23 @@
  * Copyright (C) by Courtanet, All Rights Reserved.
  */
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class TemporalGraph {
 
-    private Set<Vertex> vertices;
-    private Set<TemporalEdge> edges;
+    private List<Vertex> vertices;
+    private List<TemporalEdge> edges;
     private int startInstant;
     private int endInstant;
 
-    public Set<Vertex> getVertices(){
+    public List<Vertex> getVertices(){
         return vertices;
     }
 
-    public Set<TemporalEdge> getEdges() {
+    public List<TemporalEdge> getEdges() {
         return edges;
     }
 
@@ -29,21 +30,11 @@ public class TemporalGraph {
         return endInstant;
     }
 
-    public void setVertices(Set<Vertex> vertices) {
+    public void setVertices(List<Vertex> vertices) {
         this.vertices = vertices;
     }
 
-    public void setVertices(List<Vertex> vertices) {
-        HashSet<Vertex> tmp = new HashSet<>();
-        for (Vertex u : vertices) {
-            tmp.add(u);
-        }
-        this.vertices = tmp;
-
-    }
-
-
-    public void setEdges(Set<TemporalEdge> edges) {
+    public void setEdges(List<TemporalEdge> edges) {
         this.edges = edges;
     }
 
@@ -64,8 +55,8 @@ public class TemporalGraph {
     }
 
     public TemporalGraph (){
-        this.vertices = new HashSet<Vertex>();
-        this.edges = new HashSet<TemporalEdge>();
+        this.vertices = new ArrayList<Vertex>();
+        this.edges = new ArrayList<TemporalEdge>();
         this.startInstant = 0;
         this.endInstant = 0;
     }

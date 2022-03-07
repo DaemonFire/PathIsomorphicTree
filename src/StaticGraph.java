@@ -2,26 +2,28 @@
  * Copyright (C) by Courtanet, All Rights Reserved.
  */
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class StaticGraph {
-    Set<Vertex> vertices;
-    Set<StaticEdge> edges;
+    List<Vertex> vertices;
+    List<StaticEdge> edges;
 
-    public Set<Vertex> getVertices() {
+    public List<Vertex> getVertices() {
         return vertices;
     }
 
-    public Set<StaticEdge> getEdges() {
+    public List<StaticEdge> getEdges() {
         return edges;
     }
 
-    public void setVertices(Set<Vertex> vertices) {
+    public void setVertices(List<Vertex> vertices) {
         this.vertices = vertices;
     }
 
-    public void setEdges(Set<StaticEdge> edges) {
+    public void setEdges(List<StaticEdge> edges) {
         this.edges = edges;
     }
 
@@ -38,7 +40,7 @@ public class StaticGraph {
     }
 
     public StaticGraph(){
-        this.vertices = new HashSet<Vertex>();
-        this.edges = new HashSet<StaticEdge>();
+        this.vertices = new ArrayList<Vertex>();
+        this.edges = new ArrayList<StaticEdge>();
     }
 }

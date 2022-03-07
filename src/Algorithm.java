@@ -18,15 +18,10 @@ public class Algorithm {
         boolean[][] matrix = new boolean[L.getVertices().size()][L.getVertices().size()];
 
         for (TemporalEdge e : L.getEdges()) {
-            StaticEdge estat = new StaticEdge(e.getU(), e.getV());
-            boolean in = false;
-            for (StaticEdge es : Lstat.getEdges()) {
-                if (es.equals(estat)) {
-                    in = true;
-                }
-            }
-            if (!in) {
+            if (matrix[L.getVertices().indexOf(e.getU())][L.getVertices().indexOf(e.getV())]!=true){
+                StaticEdge estat = new StaticEdge(e.getU(), e.getV());
                 Lstat.addEdge(estat);
+                matrix[L.getVertices().indexOf(e.getU())][L.getVertices().indexOf(e.getV())] = true;
             }
         }
         return Lstat;
@@ -35,10 +30,12 @@ public class Algorithm {
     public static StaticGraph staticThisGraph(SequenceGraph P) {
         StaticGraph Pstat = new StaticGraph();
         Pstat.setVertices(P.getVertices());
+        boolean[][]matrix = new boolean[P.getVertices().size()][P.getVertices().size()];
 
         for (StaticEdge e : P.getEdges()) {
-            if (!Pstat.getEdges().contains(e)) {
+            if (matrix[P.getVertices().indexOf(e.getU())][P.getVertices().indexOf(e.getV())]!=true){
                 Pstat.addEdge(e);
+                matrix[P.getVertices().indexOf(e.getU())][P.getVertices().indexOf(e.getV())] = true;
             }
         }
         return Pstat;
@@ -362,6 +359,7 @@ public class Algorithm {
             List<Isomorphism> tempIso = new ArrayList<>();
             tempIso.add(isomorphism);
             for (TemporalEdge e : isomorphism.getS()) {
+              //  System.out.println("Exploring edge n°"+isomorphism.getS().indexOf(e)+"/"+isomorphism.getS().size()+" with "+tempIso.size() + " prospective isomorphisms");
                 int i = 0;
                 while (i < P.getEdges().size()) {
                     if ((P.getEdges().get(i).getU().equals(isomorphism.getMappings().get(e.getU())) && P.getEdges()
@@ -460,12 +458,13 @@ public class Algorithm {
                     tempIso.addAll(toAdd);
                 }
          //   }
-
+          //  System.out.println("Verifying isomorphisms");
             for (Isomorphism iso : tempIso) {
                 if (iso.getOrder() == P.getEdges().size()) {
                     isomorphisms.add(iso);
                 }
             }
+          //  System.out.println("Found "+isomorphisms.size()+" isomorphisms so far");
             System.out.println("Computed clique n°" + count +"/"+cliques.size());
             count ++;
           //  isomorphisms.addAll(tempIso);

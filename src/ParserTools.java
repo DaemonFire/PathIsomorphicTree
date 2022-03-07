@@ -25,7 +25,7 @@ public class ParserTools {
         String s = r.readLine();
         int i = 0;
         while (s != null) {
-            String[] points = s.replaceAll("\n", "").split(" ");
+            String[] points = s.replaceAll("\n", "").split(",");
             Vertex v;
             Vertex u;
             if (indexToVertex.containsKey(Integer.parseInt(points[0]))){

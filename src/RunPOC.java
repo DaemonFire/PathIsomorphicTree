@@ -20,13 +20,13 @@ public class RunPOC {
             System.err.println("OH NO !");
         }
 
-        int delta = 400;
+        int delta = 230;
         Date startTime = new Date();
 
         List<Isomorphism> result = Algorithm.computeAllIsomorphisms(L, P, delta);
         Date endTime = new Date();
         long timeElapsed = endTime.getTime() - startTime.getTime();
-
+        System.out.println("Found "+ result.size()+ " isomorphisms");
         System.out.println("Delta-isomorphisms computed in " + timeElapsed + " ms");
     }
 }
