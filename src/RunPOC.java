@@ -21,9 +21,12 @@ public class RunPOC {
         }
 
         int delta = 230;
+        /*StaticGraph Lstat = Algorithm.staticThisGraph(L);
+        StaticGraph Pstat = Algorithm.staticThisGraph(P);*/
         Date startTime = new Date();
 
-        List<Isomorphism> result = Algorithm.computeAllIsomorphisms(L, P, delta);
+        //List<StaticIsomorphism> result = Algorithm.computeAllIsomorphims(Lstat, Pstat);
+        List<Isomorphism> result = Algorithm.computeAllSequentialIsomorphisms(L, P, delta);
         Date endTime = new Date();
         long timeElapsed = endTime.getTime() - startTime.getTime();
         System.out.println("Found "+ result.size()+ " isomorphisms");

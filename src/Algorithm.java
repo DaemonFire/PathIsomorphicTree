@@ -18,7 +18,7 @@ public class Algorithm {
         boolean[][] matrix = new boolean[L.getVertices().size()][L.getVertices().size()];
 
         for (TemporalEdge e : L.getEdges()) {
-            if (matrix[L.getVertices().indexOf(e.getU())][L.getVertices().indexOf(e.getV())]!=true){
+            if (matrix[L.getVertices().indexOf(e.getU())][L.getVertices().indexOf(e.getV())] != true) {
                 StaticEdge estat = new StaticEdge(e.getU(), e.getV());
                 Lstat.addEdge(estat);
                 matrix[L.getVertices().indexOf(e.getU())][L.getVertices().indexOf(e.getV())] = true;
@@ -30,10 +30,10 @@ public class Algorithm {
     public static StaticGraph staticThisGraph(SequenceGraph P) {
         StaticGraph Pstat = new StaticGraph();
         Pstat.setVertices(P.getVertices());
-        boolean[][]matrix = new boolean[P.getVertices().size()][P.getVertices().size()];
+        boolean[][] matrix = new boolean[P.getVertices().size()][P.getVertices().size()];
 
         for (StaticEdge e : P.getEdges()) {
-            if (matrix[P.getVertices().indexOf(e.getU())][P.getVertices().indexOf(e.getV())]!=true){
+            if (matrix[P.getVertices().indexOf(e.getU())][P.getVertices().indexOf(e.getV())] != true) {
                 Pstat.addEdge(e);
                 matrix[P.getVertices().indexOf(e.getU())][P.getVertices().indexOf(e.getV())] = true;
             }
@@ -108,10 +108,10 @@ public class Algorithm {
                     for (List<Vertex> l : deeperCliques) {
                         l.add(vertices.get(i));
                         boolean alreadyin = false;
-                        for (List<Vertex> r : result){
+                        for (List<Vertex> r : result) {
                             List<Vertex> tmp = new ArrayList<>(r);
                             tmp.removeAll(l);
-                            if (tmp.isEmpty()){
+                            if (tmp.isEmpty()) {
                                 alreadyin = true;
                                 break;
                             }
@@ -128,38 +128,35 @@ public class Algorithm {
         return result;
     }
 
-    public static List<Isomorphism> computeAllIsomorphisms(TemporalGraph L, SequenceGraph P, int delta) {
-        StaticGraph Lstat = staticThisGraph(L);
-        StaticGraph Pstat = staticThisGraph(P);
-
-        HashMap<Vertex, TemporalEdge> vertexToMapping = new HashMap<>();
+    public static List<StaticIsomorphism> computeAllIsomorphims(StaticGraph G, StaticGraph P){
+        HashMap<Vertex, StaticEdge> vertexToMapping = new HashMap<>();
 
         StaticGraph M = new StaticGraph();
 
-        DegreeComparator LstatComp = new DegreeComparator(Lstat);
-        DegreeComparator PstatComp = new DegreeComparator(Pstat);
+        DegreeComparator GComp = new DegreeComparator(G);
+        DegreeComparator PComp = new DegreeComparator(P);
 
-        for (Vertex x : Lstat.getVertices()) {
-            for (Vertex y : Pstat.getVertices()) {
-                if (LstatComp.degree(x, Lstat) >= PstatComp.degree(y, Pstat)) {
+        for (Vertex x : G.getVertices()) {
+            for (Vertex y : P.getVertices()) {
+                if (GComp.degree(x, G) >= PComp.degree(y, P)) {
                     Vertex u = new Vertex(x.getLabel() + "->" + y.getLabel());
-                    TemporalEdge e = new TemporalEdge(x, y, 0);
+                    StaticEdge e = new StaticEdge(x, y);
                     vertexToMapping.put(u, e);
                     M.addVertex(u);
                 }
             }
         }
 
-        StaticGraph PstatBar = invertThisGraph(Pstat);
-        StaticGraph LstatBar = invertThisGraph(Lstat);
+        StaticGraph PBar = invertThisGraph(P);
+        StaticGraph GBar = invertThisGraph(G);
         Date startTime = new Date();
 
-        for (StaticEdge e1 : Pstat.getEdges()) {
-            for (StaticEdge e2 : Lstat.getEdges()) {
-                TemporalEdge m11 = new TemporalEdge(e1.getU(), e2.getU(), 0);
-                TemporalEdge m12 = new TemporalEdge(e1.getV(), e2.getV(), 0);
-                TemporalEdge m21 = new TemporalEdge(e1.getU(), e2.getV(), 0);
-                TemporalEdge m22 = new TemporalEdge(e1.getV(), e2.getU(), 0);
+        for (StaticEdge e1 : P.getEdges()) {
+            for (StaticEdge e2 : G.getEdges()) {
+                StaticEdge m11 = new StaticEdge(e1.getU(), e2.getU());
+                StaticEdge m12 = new StaticEdge(e1.getV(), e2.getV());
+                StaticEdge m21 = new StaticEdge(e1.getU(), e2.getV());
+                StaticEdge m22 = new StaticEdge(e1.getV(), e2.getU());
 
                 if (vertexToMapping.containsValue(m11) && vertexToMapping.containsValue(m12)) {
                     Vertex a = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m11)).findFirst()
@@ -167,7 +164,7 @@ public class Algorithm {
                     Vertex b = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m12)).findFirst()
                             .get().getKey();
                     StaticEdge ab = new StaticEdge(a, b);
-                    if (M.getEdges().stream().filter(e -> e.equals(ab)).count() == 0) {
+                    if (!M.getEdges().contains(ab)) {
                         M.addEdge(ab);
                     }
                 }
@@ -178,19 +175,19 @@ public class Algorithm {
                             .get().getKey();
 
                     StaticEdge ab = new StaticEdge(a, b);
-                    if (M.getEdges().stream().filter(e -> e.equals(ab)).count() == 0) {
+                    if (!M.getEdges().contains(ab)) {
                         M.addEdge(ab);
                     }
                 }
             }
         }
 
-        for (StaticEdge e1 : PstatBar.getEdges()) {
-            for (StaticEdge e2 : LstatBar.getEdges()) {
-                TemporalEdge m11 = new TemporalEdge(e1.getU(), e2.getU(), 0);
-                TemporalEdge m12 = new TemporalEdge(e1.getV(), e2.getV(), 0);
-                TemporalEdge m21 = new TemporalEdge(e1.getU(), e2.getV(), 0);
-                TemporalEdge m22 = new TemporalEdge(e1.getV(), e2.getU(), 0);
+        for (StaticEdge e1 : PBar.getEdges()) {
+            for (StaticEdge e2 : GBar.getEdges()) {
+                StaticEdge m11 = new StaticEdge(e1.getU(), e2.getU());
+                StaticEdge m12 = new StaticEdge(e1.getV(), e2.getV());
+                StaticEdge m21 = new StaticEdge(e1.getU(), e2.getV());
+                StaticEdge m22 = new StaticEdge(e1.getV(), e2.getU());
 
                 if (vertexToMapping.containsValue(m11) && vertexToMapping.containsValue(m12)) {
                     Vertex a = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m11)).findFirst()
@@ -198,7 +195,7 @@ public class Algorithm {
                     Vertex b = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m12)).findFirst()
                             .get().getKey();
                     StaticEdge ab = new StaticEdge(a, b);
-                    if (M.getEdges().stream().filter(e -> e.equals(ab)).count() == 0) {
+                    if (!M.getEdges().contains(ab)) {
                         M.addEdge(ab);
                     }
                 }
@@ -209,40 +206,40 @@ public class Algorithm {
                             .get().getKey();
 
                     StaticEdge ab = new StaticEdge(a, b);
-                    if (M.getEdges().stream().filter(e -> e.equals(ab)).count() == 0) {
+                    if (!M.getEdges().contains(ab)) {
                         M.addEdge(ab);
                     }
                 }
             }
         }
-/*
-        for (StaticEdge e1 : PstatBar.getEdges()) {
-            for (StaticEdge e2 : Lstat.getEdges()) {
-                TemporalEdge m11 = new TemporalEdge(e1.getU(), e2.getU(), 0);
-                TemporalEdge m12 = new TemporalEdge(e1.getV(), e2.getV(), 0);
-                TemporalEdge m21 = new TemporalEdge(e1.getU(), e2.getV(), 0);
-                TemporalEdge m22 = new TemporalEdge(e1.getV(), e2.getU(), 0);
+
+        for (StaticEdge e1 : PBar.getEdges()) {
+            for (StaticEdge e2 : G.getEdges()) {
+                StaticEdge m11 = new StaticEdge(e1.getU(), e2.getU());
+                StaticEdge m12 = new StaticEdge(e1.getV(), e2.getV());
+                StaticEdge m21 = new StaticEdge(e1.getU(), e2.getV());
+                StaticEdge m22 = new StaticEdge(e1.getV(), e2.getU());
                 Vertex a1 = null;
                 Vertex b1 = null;
                 Vertex a2 = null;
                 Vertex b2 = null;
 
-                Optional<Entry<Vertex, TemporalEdge>> oa1 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> oa1 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m11)).findFirst();
                 if (oa1.isPresent()) {
                     a1 = oa1.get().getKey();
                 }
-                Optional<Entry<Vertex, TemporalEdge>> ob1 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> ob1 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m12)).findFirst();
                 if (ob1.isPresent()) {
                     b1 = ob1.get().getKey();
                 }
-                Optional<Entry<Vertex, TemporalEdge>> oa2 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> oa2 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m21)).findFirst();
                 if (oa2.isPresent()) {
                     a2 = oa2.get().getKey();
                 }
-                Optional<Entry<Vertex, TemporalEdge>> ob2 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> ob2 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m22)).findFirst();
                 if (ob2.isPresent()) {
                     b2 = ob2.get().getKey();
@@ -259,34 +256,34 @@ public class Algorithm {
                 }
             }
         }
-*/
-        for (StaticEdge e1 : Pstat.getEdges()) {
-            for (StaticEdge e2 : LstatBar.getEdges()) {
-                TemporalEdge m11 = new TemporalEdge(e1.getU(), e2.getU(), 0);
-                TemporalEdge m12 = new TemporalEdge(e1.getV(), e2.getV(), 0);
-                TemporalEdge m21 = new TemporalEdge(e1.getU(), e2.getV(), 0);
-                TemporalEdge m22 = new TemporalEdge(e1.getV(), e2.getU(), 0);
+
+        for (StaticEdge e1 : P.getEdges()) {
+            for (StaticEdge e2 : GBar.getEdges()) {
+                StaticEdge m11 = new StaticEdge(e1.getU(), e2.getU());
+                StaticEdge m12 = new StaticEdge(e1.getV(), e2.getV());
+                StaticEdge m21 = new StaticEdge(e1.getU(), e2.getV());
+                StaticEdge m22 = new StaticEdge(e1.getV(), e2.getU());
                 Vertex a1 = null;
                 Vertex b1 = null;
                 Vertex a2 = null;
                 Vertex b2 = null;
 
-                Optional<Entry<Vertex, TemporalEdge>> oa1 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> oa1 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m11)).findFirst();
                 if (oa1.isPresent()) {
                     a1 = oa1.get().getKey();
                 }
-                Optional<Entry<Vertex, TemporalEdge>> ob1 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> ob1 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m12)).findFirst();
                 if (ob1.isPresent()) {
                     b1 = ob1.get().getKey();
                 }
-                Optional<Entry<Vertex, TemporalEdge>> oa2 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> oa2 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m21)).findFirst();
                 if (oa2.isPresent()) {
                     a2 = oa2.get().getKey();
                 }
-                Optional<Entry<Vertex, TemporalEdge>> ob2 = vertexToMapping.entrySet().stream().filter(e -> e
+                Optional<Entry<Vertex, StaticEdge>> ob2 = vertexToMapping.entrySet().stream().filter(e -> e
                         .getValue().equals(m22)).findFirst();
                 if (ob2.isPresent()) {
                     b2 = ob2.get().getKey();
@@ -307,8 +304,8 @@ public class Algorithm {
         ArrayList<StaticEdge> toDelete = new ArrayList<>();
 
         for (StaticEdge e : M.getEdges()) {
-            TemporalEdge m1 = vertexToMapping.get(e.getU());
-            TemporalEdge m2 = vertexToMapping.get(e.getV());
+            StaticEdge m1 = vertexToMapping.get(e.getU());
+            StaticEdge m2 = vertexToMapping.get(e.getV());
 
             Vertex xm1 = m1.getU();
             Vertex ym1 = m1.getV();
@@ -336,12 +333,193 @@ public class Algorithm {
         timeElapsed = endTime.getTime() - startTime.getTime();
 
         System.out.println("Cliques computed in " + timeElapsed + " ms");
-     //   System.out.println(cliques.stream().filter(c -> isClique(c, M)).count()+"/"+cliques.stream().count());
+        //   System.out.println(cliques.stream().filter(c -> isClique(c, M)).count()+"/"+cliques.stream().count());
+        int count = 1;
+        ArrayList<StaticIsomorphism> result = new ArrayList<>();
+        for (List<Vertex> c : cliques){
+            StaticIsomorphism i = new StaticIsomorphism();
+            System.out.println("Isomorphism " + count + ":");
+            for (Vertex v : c){
+                i.addMapping(vertexToMapping.get(v).getU(), vertexToMapping.get(v).getV());
+                System.out.println(vertexToMapping.get(v).getU().getLabel()+" => "+ vertexToMapping.get(v).getV().getLabel());
+            }
+            result.add(i);
+            count ++;
+        }
+
+        return result;
+    }
+
+    public static List<Isomorphism> computeAllSequentialIsomorphisms(TemporalGraph L, SequenceGraph P, int delta) {
+        StaticGraph Lstat = staticThisGraph(L);
+        StaticGraph Pstat = staticThisGraph(P);
+
+        HashMap<Vertex, StaticEdge> vertexToMapping = new HashMap<>();
+
+        StaticGraph M = new StaticGraph();
+
+        DegreeComparator LstatComp = new DegreeComparator(Lstat);
+        DegreeComparator PstatComp = new DegreeComparator(Pstat);
+
+        for (Vertex x : Lstat.getVertices()) {
+            for (Vertex y : Pstat.getVertices()) {
+                if (LstatComp.degree(x, Lstat) >= PstatComp.degree(y, Pstat)) {
+                    Vertex u = new Vertex(x.getLabel() + "->" + y.getLabel());
+                    StaticEdge e = new StaticEdge(x, y);
+                    vertexToMapping.put(u, e);
+                    M.addVertex(u);
+                }
+            }
+        }
+
+        StaticGraph PstatBar = invertThisGraph(Pstat);
+        StaticGraph LstatBar = invertThisGraph(Lstat);
+        Date startTime = new Date();
+
+        for (StaticEdge e1 : Pstat.getEdges()) {
+            for (StaticEdge e2 : Lstat.getEdges()) {
+                StaticEdge m11 = new StaticEdge(e1.getU(), e2.getU());
+                StaticEdge m12 = new StaticEdge(e1.getV(), e2.getV());
+                StaticEdge m21 = new StaticEdge(e1.getU(), e2.getV());
+                StaticEdge m22 = new StaticEdge(e1.getV(), e2.getU());
+
+                if (vertexToMapping.containsValue(m11) && vertexToMapping.containsValue(m12)) {
+                    Vertex a = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m11)).findFirst()
+                            .get().getKey();
+                    Vertex b = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m12)).findFirst()
+                            .get().getKey();
+                    StaticEdge ab = new StaticEdge(a, b);
+                    if (!M.getEdges().contains(ab)) {
+                        M.addEdge(ab);
+                    }
+                }
+                if (vertexToMapping.containsValue(m21) && vertexToMapping.containsValue(m22)) {
+                    Vertex a = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m21)).findFirst()
+                            .get().getKey();
+                    Vertex b = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m22)).findFirst()
+                            .get().getKey();
+
+                    StaticEdge ab = new StaticEdge(a, b);
+                    if (!M.getEdges().contains(ab)) {
+                        M.addEdge(ab);
+                    }
+                }
+            }
+        }
+
+        for (StaticEdge e1 : PstatBar.getEdges()) {
+            for (StaticEdge e2 : LstatBar.getEdges()) {
+                StaticEdge m11 = new StaticEdge(e1.getU(), e2.getU());
+                StaticEdge m12 = new StaticEdge(e1.getV(), e2.getV());
+                StaticEdge m21 = new StaticEdge(e1.getU(), e2.getV());
+                StaticEdge m22 = new StaticEdge(e1.getV(), e2.getU());
+
+                if (vertexToMapping.containsValue(m11) && vertexToMapping.containsValue(m12)) {
+                    Vertex a = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m11)).findFirst()
+                            .get().getKey();
+                    Vertex b = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m12)).findFirst()
+                            .get().getKey();
+                    StaticEdge ab = new StaticEdge(a, b);
+                    if (!M.getEdges().contains(ab)) {
+                        M.addEdge(ab);
+                    }
+                }
+                if (vertexToMapping.containsValue(m21) && vertexToMapping.containsValue(m22)) {
+                    Vertex a = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m21)).findFirst()
+                            .get().getKey();
+                    Vertex b = vertexToMapping.entrySet().stream().filter(e -> e.getValue().equals(m22)).findFirst()
+                            .get().getKey();
+
+                    StaticEdge ab = new StaticEdge(a, b);
+                    if (!M.getEdges().contains(ab)) {
+                        M.addEdge(ab);
+                    }
+                }
+            }
+        }
+
+        for (StaticEdge e1 : Pstat.getEdges()) {
+            for (StaticEdge e2 : LstatBar.getEdges()) {
+                StaticEdge m11 = new StaticEdge(e1.getU(), e2.getU());
+                StaticEdge m12 = new StaticEdge(e1.getV(), e2.getV());
+                StaticEdge m21 = new StaticEdge(e1.getU(), e2.getV());
+                StaticEdge m22 = new StaticEdge(e1.getV(), e2.getU());
+                Vertex a1 = null;
+                Vertex b1 = null;
+                Vertex a2 = null;
+                Vertex b2 = null;
+
+                Optional<Entry<Vertex, StaticEdge>> oa1 = vertexToMapping.entrySet().stream().filter(e -> e
+                        .getValue().equals(m11)).findFirst();
+                if (oa1.isPresent()) {
+                    a1 = oa1.get().getKey();
+                }
+                Optional<Entry<Vertex, StaticEdge>> ob1 = vertexToMapping.entrySet().stream().filter(e -> e
+                        .getValue().equals(m12)).findFirst();
+                if (ob1.isPresent()) {
+                    b1 = ob1.get().getKey();
+                }
+                Optional<Entry<Vertex, StaticEdge>> oa2 = vertexToMapping.entrySet().stream().filter(e -> e
+                        .getValue().equals(m21)).findFirst();
+                if (oa2.isPresent()) {
+                    a2 = oa2.get().getKey();
+                }
+                Optional<Entry<Vertex, StaticEdge>> ob2 = vertexToMapping.entrySet().stream().filter(e -> e
+                        .getValue().equals(m22)).findFirst();
+                if (ob2.isPresent()) {
+                    b2 = ob2.get().getKey();
+                }
+
+                StaticEdge ab1 = new StaticEdge(a1, b1);
+                StaticEdge ab2 = new StaticEdge(a2, b2);
+
+                if (M.getEdges().contains(ab1)) {
+                    M.removeEdge(ab1);
+                }
+                if (M.getEdges().contains(ab2)) {
+                    M.removeEdge(ab2);
+                }
+            }
+        }
+
+        ArrayList<StaticEdge> toDelete = new ArrayList<>();
+
+        for (StaticEdge e : M.getEdges()) {
+            StaticEdge m1 = vertexToMapping.get(e.getU());
+            StaticEdge m2 = vertexToMapping.get(e.getV());
+
+            Vertex xm1 = m1.getU();
+            Vertex ym1 = m1.getV();
+            Vertex xm2 = m2.getU();
+            Vertex ym2 = m2.getV();
+
+            if ((xm1 == xm2) || (ym1 == ym2)) {
+                toDelete.add(e);
+            }
+        }
+
+        for (StaticEdge e : toDelete) {
+            M.removeEdge(e);
+        }
+
+        Date endTime = new Date();
+
+        long timeElapsed = endTime.getTime() - startTime.getTime();
+
+        System.out.println("M constructed in " + timeElapsed + " ms");
+        startTime = new Date();
+        List<List<Vertex>> cliques = findCliques(M, P.getVertices().size(), 1);
+
+        endTime = new Date();
+        timeElapsed = endTime.getTime() - startTime.getTime();
+
+        System.out.println("Cliques computed in " + timeElapsed + " ms");
+        //   System.out.println(cliques.stream().filter(c -> isClique(c, M)).count()+"/"+cliques.stream().count());
 
         TemporalComparator temporalComparator = new TemporalComparator();
 
         List<Isomorphism> isomorphisms = new ArrayList<>();
-    int count = 1;
+        int count = 1;
         for (List<Vertex> c : cliques) {
             Isomorphism isomorphism = new Isomorphism(0);
             for (Vertex u : c) {
@@ -359,7 +537,8 @@ public class Algorithm {
             List<Isomorphism> tempIso = new ArrayList<>();
             tempIso.add(isomorphism);
             for (TemporalEdge e : isomorphism.getS()) {
-              //  System.out.println("Exploring edge n°"+isomorphism.getS().indexOf(e)+"/"+isomorphism.getS().size()+" with "+tempIso.size() + " prospective isomorphisms");
+                //  System.out.println("Exploring edge n°"+isomorphism.getS().indexOf(e)+"/"+isomorphism.getS().size
+                // ()+" with "+tempIso.size() + " prospective isomorphisms");
                 int i = 0;
                 while (i < P.getEdges().size()) {
                     if ((P.getEdges().get(i).getU().equals(isomorphism.getMappings().get(e.getU())) && P.getEdges()
@@ -385,99 +564,97 @@ public class Algorithm {
                         tempIso.add(iso);
                     }
                 } else {
-*/                    ArrayList<Isomorphism> toAdd = new ArrayList<>();
-                    ArrayList<Isomorphism> toRemove = new ArrayList<>();
-                    for (Isomorphism iso : tempIso) {
-                        if ((iso.getOrder() != P.getEdges().size()) && (e.getT() - iso.getStartInstant() > delta)) {
-                            toRemove.add(iso);
-                        } else {
-                            if (iso.getOrder() == i) {
-                                if (iso.getOrder() == 0){
-                                    iso.setStartInstant(e.getT());
+*/
+                ArrayList<Isomorphism> toAdd = new ArrayList<>();
+                ArrayList<Isomorphism> toRemove = new ArrayList<>();
+                for (Isomorphism iso : tempIso) {
+                    if ((iso.getOrder() != P.getEdges().size()) && (e.getT() - iso.getStartInstant() > delta)) {
+                        toRemove.add(iso);
+                    } else {
+                        if (iso.getOrder() == i) {
+                            if (iso.getOrder() == 0) {
+                                iso.setStartInstant(e.getT());
+                            }
+                            iso.addToSequence(e);
+                            iso.setOrder(i + 1);
+                        } else if (iso.getOrder() > i) {
+                            Isomorphism isomorphism2 = new Isomorphism(iso.getStartInstant());
+                            isomorphism2.setOrder(i + 1);
+                            for (int j = 0; j < i; j++) {
+                                isomorphism2.addToSequence(iso.getSequence().get(j));
+                            }
+                            for (int j = 0; j < P.getEdges().size(); j++) {
+                                if (iso.getTmp().containsKey(j)) {
+                                    isomorphism2.addToTmp(j, iso.getTmp().get(j));
                                 }
-                                iso.addToSequence(e);
-                                iso.setOrder(i + 1);
-                            } else if (iso.getOrder() > i) {
+                            }
+                            isomorphism2.setS(iso.getS());
+                            isomorphism2.setA(iso.getA());
+                            isomorphism2.setMappings(iso.getMappings());
+                            isomorphism2.addToSequence(e);
+                            toAdd.add(isomorphism2);
+                        } else {
+                            if (!iso.getTmp().containsKey(i)) {
+                                iso.addToTmp(i, e);
+                            } else {
                                 Isomorphism isomorphism2 = new Isomorphism(iso.getStartInstant());
-                                isomorphism2.setOrder(i + 1);
-                                for (int j = 0; j< i; j++){
+                                isomorphism2.setOrder(iso.getOrder());
+                                isomorphism2.setMappings(iso.getMappings());
+                                isomorphism2.setA(iso.getA());
+                                for (int j = 0; j < iso.getSequence().size(); j++) {
                                     isomorphism2.addToSequence(iso.getSequence().get(j));
                                 }
-                                for (int j = 0; j<P.getEdges().size(); j ++) {
-                                    if (iso.getTmp().containsKey(j)) {
-                                        isomorphism2.addToTmp(j, iso.getTmp().get(j));
-                                    }
-                                }
                                 isomorphism2.setS(iso.getS());
-                                isomorphism2.setA(iso.getA());
-                                isomorphism2.setMappings(iso.getMappings());
-                                isomorphism2.addToSequence(e);
-                                toAdd.add(isomorphism2);
-                            }
-                            else {
-                                if (!iso.getTmp().containsKey(i)) {
-                                    iso.addToTmp(i, e);
-                                }
-                                else {
-                                    Isomorphism isomorphism2 = new Isomorphism(iso.getStartInstant());
-                                    isomorphism2.setOrder(iso.getOrder());
-                                    isomorphism2.setMappings(iso.getMappings());
-                                    isomorphism2.setA(iso.getA());
-                                    for (int j = 0; j<iso.getSequence().size(); j ++) {
-                                        isomorphism2.addToSequence(iso.getSequence().get(j));
-                                    }
-                                    isomorphism2.setS(iso.getS());
-                                    for (int j = 0; j<P.getEdges().size(); j ++) {
-                                        if (iso.getTmp().containsKey(j)) {
-                                            if (j != i) {
-                                                isomorphism2.addToTmp(j, iso.getTmp().get(j));
-                                            }
-                                            else {
-                                                isomorphism2.addToTmp(i,e);
-                                            }
+                                for (int j = 0; j < P.getEdges().size(); j++) {
+                                    if (iso.getTmp().containsKey(j)) {
+                                        if (j != i) {
+                                            isomorphism2.addToTmp(j, iso.getTmp().get(j));
+                                        } else {
+                                            isomorphism2.addToTmp(i, e);
                                         }
                                     }
-                                    toAdd.add(isomorphism2);
                                 }
-                            }
-                        }
-                        for (int j = iso.getOrder(); j<P.getEdges().size(); j++){
-                            if (iso.getTmp().containsKey(j)){
-                                if (iso.getTmp().get(j).getT()<e.getT()){
-                                    iso.removeFromTmp(j);
-                                }
-                                else if (j==iso.getOrder()){
-                                    iso.addToSequence(iso.getTmp().get(j));
-                                    iso.setOrder(j+1);
-                                    iso.removeFromTmp(j);
-                                }
+                                toAdd.add(isomorphism2);
                             }
                         }
                     }
-                    tempIso.removeAll(toRemove);
-                    tempIso.addAll(toAdd);
+                    for (int j = iso.getOrder(); j < P.getEdges().size(); j++) {
+                        if (iso.getTmp().containsKey(j)) {
+                            if (iso.getTmp().get(j).getT() < e.getT()) {
+                                iso.removeFromTmp(j);
+                            } else if (j == iso.getOrder()) {
+                                iso.addToSequence(iso.getTmp().get(j));
+                                iso.setOrder(j + 1);
+                                iso.removeFromTmp(j);
+                            }
+                        }
+                    }
                 }
-         //   }
-          //  System.out.println("Verifying isomorphisms");
+                tempIso.removeAll(toRemove);
+                tempIso.addAll(toAdd);
+            }
+            //   }
+            //  System.out.println("Verifying isomorphisms");
             for (Isomorphism iso : tempIso) {
                 if (iso.getOrder() == P.getEdges().size()) {
                     isomorphisms.add(iso);
                 }
             }
-          //  System.out.println("Found "+isomorphisms.size()+" isomorphisms so far");
-            System.out.println("Computed clique n°" + count +"/"+cliques.size());
-            count ++;
-          //  isomorphisms.addAll(tempIso);
+            //  System.out.println("Found "+isomorphisms.size()+" isomorphisms so far");
+            System.out.println("Computed clique n°" + count + "/" + cliques.size());
+            count++;
+            //  isomorphisms.addAll(tempIso);
 
         }
         return isomorphisms;
     }
 
     static boolean isClique(List<Vertex> clique, StaticGraph G) {
-        for(Vertex x: clique){
-            for (Vertex y: clique){
+        for (Vertex x : clique) {
+            for (Vertex y : clique) {
                 if (!x.equals(y)) {
-                    Optional<StaticEdge> o = G.getEdges().stream().filter(e -> (e.getU().equals(x) && e.getV().equals(y)) || (e.getU().equals(y) && e.getV().equals(x))).findFirst();
+                    Optional<StaticEdge> o = G.getEdges().stream().filter(e -> (e.getU().equals(x) && e.getV().equals
+                            (y)) || (e.getU().equals(y) && e.getV().equals(x))).findFirst();
 
                     if (!o.isPresent()) {
                         return false;
