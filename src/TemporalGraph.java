@@ -46,14 +46,6 @@ public class TemporalGraph {
         this.endInstant = endInstant;
     }
 
-    public void addVertex(Vertex u){
-        vertices.add(u);
-    }
-
-    public void addTemporalEdge(TemporalEdge e){
-        edges.add(e);
-    }
-
     public TemporalGraph (){
         this.vertices = new ArrayList<Vertex>();
         this.edges = new ArrayList<TemporalEdge>();

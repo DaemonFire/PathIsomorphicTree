@@ -12,7 +12,7 @@ public class ParserTools {
 
 
 
-    public static TemporalGraph parseTemporalGraph (String filePath) throws IOException {
+    public static TemporalGraph parseTemporalGraph (String filePath, String label) throws IOException {
         HashMap<Integer,Vertex> indexToVertex;
         TemporalGraph ls;
         ArrayList<Vertex> vertices = new ArrayList<>();
@@ -32,20 +32,18 @@ public class ParserTools {
                 u = indexToVertex.get(Integer.parseInt(points[0]));
             }
             else {
-                u = new Vertex("L"+i);
+                u = new Vertex(label+i);
                 i++;
                 indexToVertex.put(Integer.parseInt(points[0]), u);
-              //  System.out.println(Integer.parseInt(points[0]) + "->" + (ls.getVertices().size()+1));
                 ls.getVertices().add(u);
             }
             if (indexToVertex.containsKey(Integer.parseInt(points[1]))){
                 v = indexToVertex.get(Integer.parseInt(points[1]));
             }
             else {
-                v = new Vertex("L"+i);
+                v = new Vertex(label+i);
                 i++;
                 indexToVertex.put(Integer.parseInt(points[1]), v);
-              //  System.out.println(Integer.parseInt(points[0]) + "->" + (ls.getVertices().size()+1));
 
                 ls.getVertices().add(v);
             }
@@ -62,51 +60,7 @@ public class ParserTools {
 
         ls.setStartInstant(startInstant);
         ls.setEndInstant(endInstant);
-     //   System.out.println("FINI");
         return ls;
-    }
-
-    public static SequenceGraph parseSequenceGraph (String filePath) throws IOException {
-        HashMap<Integer,Vertex> indexToVertex;
-        SequenceGraph p;
-        ArrayList<Vertex> vertices = new ArrayList<>();
-        p = new SequenceGraph();
-        p.setVertices(vertices);
-        indexToVertex = new HashMap<>();
-        BufferedReader r = new BufferedReader(new FileReader(filePath));
-        String s = r.readLine();
-        int i=0;
-        while (s != null) {
-            String[] points = s.replaceAll("\n", "").split(" ");
-            Vertex v;
-            Vertex u;
-            if (indexToVertex.containsKey(Integer.parseInt(points[0]))){
-                u = indexToVertex.get(Integer.parseInt(points[0]));
-            }
-            else {
-                u = new Vertex("P"+i);
-                i++;
-                indexToVertex.put(Integer.parseInt(points[0]), u);
-                System.out.println(Integer.parseInt(points[0]) + "->" + (p.getVertices().size()+1));
-                p.getVertices().add(u);
-            }
-            if (indexToVertex.containsKey(Integer.parseInt(points[1]))){
-                v = indexToVertex.get(Integer.parseInt(points[1]));
-            }
-            else {
-                v = new Vertex("P"+i);
-                i++;
-                indexToVertex.put(Integer.parseInt(points[1]), v);
-                System.out.println(Integer.parseInt(points[0]) + "->" + (p.getVertices().size()+1));
-
-                p.getVertices().add(v);
-            }
-            p.getEdges().add(new StaticEdge(u, v));
-            s = r.readLine();
-        }
-
-        System.out.println("FINI");
-        return p;
     }
 
 }
